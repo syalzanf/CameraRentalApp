@@ -1,0 +1,128 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - CameraRentalApp</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.11/jquery.validate.unobtrusive.min.js"></script>
+
+        
+
+
+
+    <style>
+        .sidebar {
+            position: relative;
+        }
+
+        .logout-btn {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 80%;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg" style="background-image: linear-gradient(to left, #024CAA, #EC8305); color: white;">
+            <div class="container-fluid">
+                <a class="nav-link active navbar-brand text-white" aria-current="page" asp-area="" asp-controller="Home" asp-action="Index">
+                    CameraRentalApp
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="d-flex align-items-center ms-auto">
+                    <span class="me-2 text-white">Welcome Admin OfcAdmin!</span>
+                    <img src="~/images/test.jpg" alt="Profile Picture" class="rounded-circle" style="width: 37px; height: 37px;">
+                </div>
+            </div>
+        </nav>
+    </header>
+
+
+    <div class="container-fluid">
+        <div class="row">
+   
+            <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block sidebar collapse p-0" style="background-color: #091057; height: calc(100vh - 56px);">
+                <div class="position-sticky">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link active text-white" aria-current="page" asp-area="" asp-controller="Home" asp-action="Index">
+                                <i class="fas fa-home"></i> Home
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" asp-area="" asp-controller="Camera" asp-action="Index">
+                                <i class="fas fa-camera"></i> Products
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" asp-area="" asp-controller="Customer" asp-action="Index">
+                                <i class="fas fa-users"></i> Customers
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" asp-area="" asp-controller="Transaction" asp-action="Index">
+                                <i class="fas fa-check-circle"></i> Data Rental
+                            </a>
+                        </li>
+                         <li class="nav-item">
+                            <a class="nav-link text-white" asp-area="" asp-controller="Transaction" asp-action="TransactionHistory">
+                                <i class="fas fa-history"></i> Transction History
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link text-white" asp-area="" asp-controller="Transaction" asp-action="Create">
+                                <i class="fas fa-cash-register"></i> Transaction
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+
+                <div class="logout-btn">
+                    <form action="/Account/Logout" method="post">
+                    <button class="btn" style="background-color: #024CAA; color: white; width: 80%; border: none;">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </button>
+                    </form>
+                </div>
+            </nav>
+
+
+            <main id="mainContent" class="col-md-9 ms-sm-auto col-lg-10 p-4" style="overflow-y: auto; height: calc(100vh - 56px);">
+                <div class="pt-0">
+                    @RenderBody()
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+
+    <script>
+        function adjustContentHeight() {
+            const headerHeight = document.querySelector('header').offsetHeight;
+            const footerHeight = document.querySelector('footer').offsetHeight;
+            const windowHeight = window.innerHeight;
+            const mainContent = document.getElementById('mainContent');
+            mainContent.style.height = (windowHeight - headerHeight - footerHeight) + 'px';
+        }
+
+        window.addEventListener('resize', adjustContentHeight);
+        window.addEventListener('load', adjustContentHeight);
+    </script>
+</body>
+</html>

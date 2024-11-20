@@ -1,0 +1,227 @@
+﻿@model CameraRentalApp.ViewModels.TransactionViewModel
+
+@{
+    ViewData["Title"] = "Create Transaction";
+}
+
+<div class="container my-4 p-4 border rounded bg-light shadow-sm">
+    <form asp-action="Create" method="post" enctype="multipart/form-data" class="row g-3" id="transactionForm">
+        <div class="col-12 d-flex justify-content-start mb-3">
+            <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#customerModal">+ Add Customer</button>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label asp-for="Transaction.CustomerId" class="form-label fw-bold">Customer</label>
+                <select asp-for="Transaction.CustomerId" class="form-select chosen-select" id="customerSelect" name="Transaction.CustomerId" data-placeholder="Select Customers">
+                    <option value="">Select Customer</option>
+                    @foreach (var customer in Model.Customers)
+                    {
+                        <option value="@customer.CustomerId">@customer.CustomerName</option>
+                    }
+                </select>
+                <span asp-validation-for="Transaction.CustomerId" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Transaction.RentalPricePerDay" class="form-label fw-bold">Price/Day</label>
+                <input asp-for="Transaction.RentalPricePerDay" id="RentalPricePerDay" type="number" class="form-control" placeholder="Price Per Day" readonly />
+                <span asp-validation-for="Transaction.RentalPricePerDay" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Transaction.RentalDate" class="form-label fw-bold">Rental Date</label>
+                <input asp-for="Transaction.RentalDate" type="date" class="form-control" id="rentalDate" onchange="previewTotalPrice()" />
+                <span asp-validation-for="Transaction.RentalDate" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Transaction.ReturnDate" class="form-label fw-bold">Return Date</label>
+                <input asp-for="Transaction.ReturnDate" type="date" class="form-control" id="returnDate" onchange="previewTotalPrice()" />
+                <span asp-validation-for="Transaction.ReturnDate" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Transaction.TotalPrice" class="form-label fw-bold">Total Price</label>
+                <input asp-for="Transaction.TotalPrice" id="TotalPrice" type="number" class="form-control" placeholder="Total Price" readonly />
+                <span asp-validation-for="Transaction.TotalPrice" class="text-danger"></span>
+            </div>
+
+             <div class="mb-3">
+                <label for="PaymentMethod" class="form-label fw-bold">Payment Method</label>
+                <select asp-for="Transaction.PaymentMethod" class="form-select" id="PaymentMethod" name="Transaction.PaymentMethod">
+                    <option value="">Select Payment Method</option>
+                    <option value="Cash">Cash</option>
+                    <option value="Debit">Debit</option>
+                    <option value="Xendit">Xendit</option>
+                    <option value="Ovo">Ovo</option>
+                    <option value="Gopay">Gopay</option>
+                </select>
+                <span asp-validation-for="Transaction.PaymentMethod" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Transaction.TotalPay" class="form-label fw-bold">Total Pay</label>
+                <input asp-for="Transaction.TotalPay" id="TotalPay" type="number" class="form-control" placeholder="Total Pay" oninput="calculateChange()" />
+                <span asp-validation-for="Transaction.TotalPay" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Transaction.Change" class="form-label fw-bold">Change</label>
+                <input asp-for="Transaction.Change" id="Change" type="number" class="form-control" placeholder="Change" readonly />
+                <span asp-validation-for="Transaction.Change" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label asp-for="Transaction.CameraId" class="form-label fw-bold">Camera</label>
+                <select asp-for="Transaction.CameraId" class="form-select chosen-select" id="cameraSelect" name="Transaction.CameraId" data-placeholder="Select Cameras" onchange="updateCameraDetails()">
+                    <option value="">Select Camera</option>
+                    @foreach (var camera in Model.Cameras)
+                    {
+                        <option value="@camera.CameraId" data-image-url="@Url.Content("~/images/cameras/" + camera.Image)" data-price="@camera.RentalPricePerDay">
+                            @camera.Name - @camera.Brand
+                        </option>
+                    }
+                </select>
+                <span asp-validation-for="Transaction.CameraId" class="text-danger"></span>
+            </div>
+
+            <div class="mt-3 text-center">
+                <img id="cameraImage" src="" alt="Selected Camera" class="img-thumbnail" style="display:none; max-width:80%;" />
+            </div>
+        </div>
+
+        <div class="col-12 d-flex justify-content-end">
+            <button type="submit" class="btn btn-primary w-100 mt-4">Submit Transaction</button>
+        </div>
+        
+        <div class="col-12">
+            <div asp-validation-summary="All" class="text-danger mt-3"></div>
+        </div>
+    </form>
+
+    <!-- Modal Add New Customer -->
+    <div class="modal fade" id="customerModal" tabindex="-1" aria-labelledby="customerModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="customerModalLabel">Add New Customer</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                <!-- Modal Add Customer -->
+            <form asp-action="AddCustomer" method="post" enctype="multipart/form-data" class="row g-3" id="transactionForm">
+                   <div class="col-md-6">
+                        <div class="mb-3">
+                            <label asp-for="Transaction.Customer.CustomerName" class="form-label fw-bold">Nama Pelanggan</label>
+                            <input asp-for="Transaction.Customer.CustomerName" class="form-control" />
+                            <span asp-validation-for="Transaction.Customer.CustomerName" class="text-danger"></span>
+                        </div>
+         
+                        <div class="mb-3">
+                            <label asp-for="Transaction.Customer.PhoneNumber" class="form-label fw-bold">Nomor Telepon</label>
+                            <input asp-for="Transaction.Customer.PhoneNumber" class="form-control" />
+                            <span asp-validation-for="Transaction.Customer.PhoneNumber" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Transaction.Customer.Email" class="form-label fw-bold">Email</label>
+                            <input asp-for="Transaction.Customer.Email" class="form-control" />
+                            <span asp-validation-for="Transaction.Customer.Email" class="text-danger"></span>
+                        </div>
+        
+                        <div class="mb-3">
+                            <label asp-for="Transaction.Customer.Address" class="form-label fw-bold">Alamat</label>
+                            <input asp-for="Transaction.Customer.Address" class="form-control" />
+                            <span asp-validation-for="Transaction.Customer.Address" class="text-danger"></span>
+                        </div>
+
+        
+                        <button type="submit" class="btn btn-primary mt-4">Tambah Pelanggan</button>
+                    </div>
+                </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.jquery.min.js"></script>
+    
+<script>
+    $(document).ready(function() {
+        $(".chosen-select").chosen({
+            width: "100%",
+            no_results_text: "No match found!"  
+        });
+    });
+
+    function updateCameraDetails() {
+        const selectElement = document.getElementById("cameraSelect");
+        const selectedOption = selectElement.options[selectElement.selectedIndex];
+        const imageUrl = selectedOption.getAttribute("data-image-url");
+        const rentalPricePerDay = selectedOption.getAttribute("data-price");
+        const imageElement = document.getElementById("cameraImage");
+
+        if (imageUrl) {
+            imageElement.src = imageUrl;
+            imageElement.style.display = "block";
+        }
+
+        if (rentalPricePerDay) {
+            document.getElementById("RentalPricePerDay").value = rentalPricePerDay;
+            previewTotalPrice();
+        }
+    }
+
+    function previewTotalPrice() {
+        const rentalDate = document.getElementById("rentalDate").value;
+        const returnDate = document.getElementById("returnDate").value;
+        const pricePerDay = parseFloat(document.getElementById("RentalPricePerDay").value);
+        const totalPriceField = document.getElementById("TotalPrice");
+
+        if (rentalDate && returnDate && pricePerDay) {
+            const rentalStart = new Date(rentalDate);
+            const rentalEnd = new Date(returnDate);
+            const rentalDays = (rentalEnd - rentalStart) / (1000 * 60 * 60 * 24);
+
+            if (rentalDays > 0) {
+                totalPriceField.value = rentalDays * pricePerDay;
+            } else {
+                totalPriceField.value = 0;
+            }
+        }
+    }
+
+    function calculateChange() {
+        const totalPay = parseFloat(document.getElementById("TotalPay").value);
+        const totalPrice = parseFloat(document.getElementById("TotalPrice").value);
+        const changeField = document.getElementById("Change");
+
+        if (!isNaN(totalPay) && !isNaN(totalPrice)) {
+            const changeAmount = totalPay - totalPrice;
+            changeField.value = changeAmount > 0 ? changeAmount : 0;
+        }
+    }
+
+    function updateTotalPayBasedOnPaymentMethod() {
+        const paymentMethod = document.getElementById("PaymentMethod").value;
+        const totalPrice = parseFloat(document.getElementById("TotalPrice").value);
+        const totalPayField = document.getElementById("TotalPay");
+
+        if (paymentMethod !== "Cash" && !isNaN(totalPrice)) {
+            totalPayField.value = totalPrice;
+        }
+    }
+
+    document.getElementById("PaymentMethod").addEventListener("change", updateTotalPayBasedOnPaymentMethod);
+
+   
+</script>
+
+}

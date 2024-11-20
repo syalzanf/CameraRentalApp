@@ -1,0 +1,151 @@
+﻿@model IEnumerable<CameraRentalApp.Models.Transaction>
+@{
+    ViewData["Title"] = "History Transaksi";
+    int pageSize = ViewBag.PageSize;
+    int pageNumber = ViewBag.PageNumber;
+    int totalItems = ViewBag.TotalItems;
+    int totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+}
+
+@section Scripts {
+    <script>
+ 
+        @if (TempData["Message"] != null)
+        {
+            <text>
+            Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: '@TempData["Message"]',
+                confirmButtonText: 'OK'
+            });
+            </text>
+        }
+
+        @if (TempData["Error"] != null)
+        {
+            <text>
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: '@TempData["Error"]',
+                confirmButtonText: 'OK'
+            });
+            </text>
+        }
+
+        // Fungsi untuk membuka modal dan memilih file bukti
+        function openConfirmReturnModal(transactionId) {
+            $('#confirmReturnModal').modal('show');
+            $('#transactionId').val(transactionId); 
+        }
+    </script>
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="mb-0">History Transaksi</h5>
+    
+    <div class="col-md-3">
+        <input type="text" class="form-control" placeholder="Search here..." value="@ViewBag.SearchTerm" oninput="handleSearch(event)" />
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">  
+            <table class="table table-striped table-hover">
+                <thead class="table-secondary">
+                    <tr>
+                        <th>Rental ID</th>
+                        <th>Customer</th>
+                        <th>Camera</th>
+                        <th>Rental Date</th>
+                        <th>Return Date</th>
+                        <th>Price Per Day</th>
+                        <th>Total Price</th>
+                        <th>Status</th>
+                        <th>Return Proof</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var transaction in Model)
+                    {
+                        <tr>
+                            <td>@transaction.RentalId</td>
+                            <td>@transaction.Customer.CustomerName</td>
+                            <td>@transaction.Camera.Name</td>
+                            <td>@transaction.RentalDate.ToString("yyyy-MM-dd")</td>
+                            <td>@transaction.ReturnDate.ToString("yyyy-MM-dd")</td>
+                            <td>@transaction.RentalPricePerDay</td>
+                            <td>@transaction.TotalPrice</td>
+                            <td>@transaction.Status</td>
+                            <td style="text-align: center;">
+                                @if (transaction.Status == "Confirmed" && !string.IsNullOrEmpty(transaction.return_proof))
+                                {
+                                    <a href="@transaction.return_proof" target="_blank">Preview</a>
+                                }
+                                else if (transaction.Status != "Confirmed")
+                                {
+                                    <span>-</span>
+                                }
+                            </td>
+                            <td style="text-align: center;">
+                                @if (transaction.Status == "Returned")
+                                {
+                                    <button class="btn btn-success" onclick="openConfirmReturnModal(@transaction.RentalId)">Confirm</button>
+                                }                         
+                                else if (transaction.Status == "Ongoing" || transaction.Status == "Confirmed" || transaction.Status == "Overdue")
+                                {
+                                   <span>-</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                <li class="page-item @(pageNumber <= 1 ? "disabled" : "")">
+                    <a class="page-link" asp-action="Index" asp-route-pageNumber="@(pageNumber - 1)" asp-route-pageSize="@pageSize" tabindex="-1">Previous</a>
+                </li>
+                
+                @for (int i = 1; i <= totalPages; i++)
+                {
+                    <li class="page-item @(i == pageNumber ? "active" : "")">
+                        <a class="page-link" asp-action="Index" asp-route-pageNumber="@i" asp-route-pageSize="@pageSize">@i</a>
+                    </li>
+                }
+                
+                <li class="page-item @(pageNumber >= totalPages ? "disabled" : "")">
+                    <a class="page-link" asp-action="Index" asp-route-pageNumber="@(pageNumber + 1)" asp-route-pageSize="@pageSize">Next</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+<div class="modal fade" id="confirmReturnModal" tabindex="-1" role="dialog" aria-labelledby="confirmReturnModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmReturnModalLabel">Upload Return Proof</h5>
+            </div>
+            <form method="post" action="@Url.Action("UploadReturnProof", "Transaction")" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <input type="hidden" id="transactionId" name="transactionId" />
+                    <div class="form-group">
+                        <label for="returnProof">Select Return Proof (File)</label>
+                        <input type="file" class="form-control-file" id="returnProof" name="returnProof" required />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Upload</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
