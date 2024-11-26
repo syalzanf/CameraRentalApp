@@ -20,6 +20,8 @@ builder.Services.AddScoped<CameraService>();
 builder.Services.AddScoped<CustomerService>();
 builder.Services.AddScoped<TransactionService>();
 builder.Services.AddHostedService<TransactionStatusUpdater>();
+builder.Services.AddLogging();
+
 
 var app = builder.Build();
 
@@ -38,6 +40,8 @@ app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthorization();
 app.UseDeveloperExceptionPage();
+app.UseAuthentication();
+app.UseAuthorization();
 
 
 app.MapControllerRoute(

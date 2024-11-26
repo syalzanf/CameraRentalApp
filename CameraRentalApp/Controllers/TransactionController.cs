@@ -64,40 +64,38 @@ namespace CameraRentalApp.Controllers
             }
 
 
-    /*    // GET: Transaction/Index
         [HttpGet]
         public async Task<IActionResult> TransactionHistory(int pageNumber = 1, int pageSize = 5, string searchTerm = "")
         {
-            var transactions = await _transactionService.GetAllTransactionsAsync()
-                .Include(t => t.Customer)
-                .Include(t => t.Camera)
-                .AsQueryable()
-                .ToListAsync();
-
-            if (!string.IsNullOrEmpty(searchTerm))
-            {
-                transactions = transactions
-                    .Where(t => t.Customer.CustomerName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                                t.RentalId.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                                t.Camera.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                                t.Status.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
-                    .ToList();
-            }
-
-            var totalItems = transactions.Count();
-            var paginatedTransactions = transactions
-                .OrderBy(t => t.RentalId)
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
-                .ToList();
+            var (transactions, totalItems) = await _transactionService.GetTransactionsAsync(pageNumber, pageSize, searchTerm);
 
             ViewBag.PageNumber = pageNumber;
             ViewBag.PageSize = pageSize;
             ViewBag.TotalItems = totalItems;
             ViewBag.SearchTerm = searchTerm;
 
-            return View(paginatedTransactions);
-        }*/
+            return View(transactions);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetDetail(int rentalId)
+        {
+            var transaction = await _transactionService.GetTransactionDetailAsync(rentalId);
+
+            if (transaction == null)
+            {
+                return NotFound(new { message = "Transaction not found" });
+            }
+
+            return Json(new
+            {
+                rentalId = transaction.RentalId,
+                customerName = transaction.Customer.CustomerName,
+                cameraName = transaction.Camera.Name,
+                rentalDate = transaction.RentalDate.ToString("yyyy-MM-dd"),
+                returnDate = transaction.ReturnDate.ToString("yyyy-MM-dd")
+            });
+        }
 
         // GET: Transaction/Create
         [HttpGet]
@@ -120,34 +118,31 @@ namespace CameraRentalApp.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(TransactionViewModel viewModel)
         {
-            if (viewModel.Transaction == null)
-            {
-                viewModel.Transaction = new Transaction();
-            }
-            
             _logger.LogInformation("CustomerId (dari form): {CustomerId}", viewModel.Transaction.CustomerId);
             _logger.LogInformation("CameraId (dari form): {CameraId}", viewModel.Transaction.CameraId);
 
             var customer = await _customerService.GetCustomerByIdAsync(viewModel.Transaction.CustomerId);
             var camera = await _cameraService.GetCameraByIdAsync(viewModel.Transaction.CameraId);
 
-            if (customer == null || camera == null)
+            if (customer == null)
             {
-                ModelState.AddModelError("", "Invalid Customer or Camera selected.");
-            }
-            else
-            {
-                viewModel.Transaction.Customer = customer;
-                viewModel.Transaction.Camera = camera;
+                ModelState.AddModelError("Customer", "Customer not found.");
+                _logger.LogError("Customer not found with ID: {CustomerId}", viewModel.Transaction.CustomerId);
             }
 
-            if (!ModelState.IsValid)
+            if (camera == null)
             {
-                ViewBag.CustomerId = viewModel.Transaction.CustomerId;
-                ViewBag.CameraId = viewModel.Transaction.CameraId;
+                ModelState.AddModelError("Camera", "Camera not found.");
+                _logger.LogError("Camera not found with ID: {CameraId}", viewModel.Transaction.CameraId);
+            }
 
-                _logger.LogInformation("Transaction: {Transaction}", JsonConvert.SerializeObject(viewModel.Transaction));
+            viewModel.Transaction.Customer = customer;
+            viewModel.Transaction.Camera = camera;
+            _logger.LogInformation("Customer setelah di-set: {Customer}", JsonConvert.SerializeObject(viewModel.Transaction.Customer));
+            _logger.LogInformation("Camera setelah di-set: {Camera}", JsonConvert.SerializeObject(viewModel.Transaction.Camera));
 
+            /*if (!ModelState.IsValid)
+            {
                 foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
                 {
                     _logger.LogError("Validation error: {Error}", error.ErrorMessage);
@@ -155,78 +150,40 @@ namespace CameraRentalApp.Controllers
 
                 viewModel.Customers = await _customerService.GetAllCustomerAsync();
                 viewModel.Cameras = await _cameraService.GetAllCameraAsync();
-
-               return View(viewModel);
-            }
+                return View(viewModel);
+            }*/
 
             try
             {
                 await _transactionService.AddTransactionAsync(viewModel.Transaction);
-
                 TempData["SuccessMessage"] = "Transaction created successfully!";
                 return RedirectToAction("Index");
             }
             catch (ArgumentException ex)
             {
                 ModelState.AddModelError("", ex.Message);
-                TempData["ErrorMessage"] = "Failed to create transaction: " + ex.Message;
-
-                _logger.LogError("Error occurred while creating transaction: {Message}", ex.Message);
+                _logger.LogError("Error creating transaction: {Message}", ex.Message);
 
                 viewModel.Customers = await _customerService.GetAllCustomerAsync();
                 viewModel.Cameras = await _cameraService.GetAllCameraAsync();
-
                 return View(viewModel);
             }
-        }
+        } 
 
-
-        /*   // GET: CreateCustomer Partial View
-           [HttpGet]
-               public IActionResult CreateCustomer()
-               {
-                   return PartialView("_CreateCustomer");
-               }*/
-
-        /*[Route("Transaction/AddCustomer")]
-        [HttpPost]
-        public async Task<IActionResult> AddCustomer([FromBody] TransactionViewModel model)
-        {
-            if (model == null || model.Transaction?.Customer == null || !ModelState.IsValid)
-            {
-                return Json(new { success = false, message = "Invalid customer data." });
-            }
-
-            try
-            {
-                // Konversi dari TransactionViewModel ke Customer
-                var newCustomer = new Customer
-                {
-                    CustomerName = model.Transaction.Customer.CustomerName,
-                    PhoneNumber = model.Transaction.Customer.PhoneNumber,
-                    Email = model.Transaction.Customer.Email,
-                    Address = model.Transaction.Customer.Address
-                };
-
-                // Panggil metode service dengan Customer
-                var addedCustomer = await _transactionService.AddCustomerAsync(newCustomer);
-
-                return Json(new { success = true, customer = addedCustomer });
-            }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, message = ex.Message });
-            }
-        }*/
 
         [Route("Transaction/AddCustomer")]
         [HttpPost]
-        public async Task<IActionResult> AddCustomer([FromBody] TransactionViewModel model)
+        public async Task<IActionResult> AddCustomer(Customer customer)
         {
-            return RedirectToAction(nameof(TransactionHistory));
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("Invalid customer data");
+            }
+
+            await _customerService.AddCustomerAsync(customer);
+
+            return RedirectToAction(nameof(Create));
         }
-
-
 
 
         [HttpPost]
@@ -247,7 +204,7 @@ namespace CameraRentalApp.Controllers
                 {
                     TempData["Error"] = "Failed to upload return proof.";   
                 }
-            }
+            }   
             else
             {
                 TempData["Error"] = "No file selected for upload.";

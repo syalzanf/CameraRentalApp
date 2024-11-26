@@ -27,29 +27,20 @@ namespace CameraRentalApp.Services
         }
 
 
-        /*   public async Task AddCustomerAsync(Customer customer)
-           {
-               if (customer == null) throw new ArgumentNullException(nameof(customer));
-
-               await _context.Customers.AddAsync(customer);
-               await _context.SaveChangesAsync();
-           }*/
-
         public async Task<Customer> AddCustomerAsync(Customer customer)
         {
-            if (customer == null)
+            if (await _context.Customers.AnyAsync(c => c.Email == customer.Email && !c.IsDeleted))
             {
-                throw new ArgumentException("Invalid customer");
+                throw new InvalidOperationException("A customer with the same email already exists.");
             }
 
             _context.Customers.Add(customer);
             await _context.SaveChangesAsync();
-
             return customer;
         }
 
 
-    public async Task AddTransactionAsync(Transaction transaction)
+        public async Task AddTransactionAsync(Transaction transaction)
 
         {
 
@@ -184,6 +175,37 @@ namespace CameraRentalApp.Services
             }
 
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<(IEnumerable<Transaction>, int)> GetTransactionsAsync(int pageNumber, int pageSize, string searchTerm)
+        {
+            var query = _context.Transactions
+                .Include(t => t.Customer)
+                .Include(t => t.Camera)
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                query = query.Where(t => t.Customer.CustomerName.Contains(searchTerm) ||
+                                         t.Camera.Name.Contains(searchTerm));
+            }
+
+            int totalItems = await query.CountAsync();
+
+            var transactions = await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return (transactions, totalItems);
+        }
+
+        public async Task<Transaction> GetTransactionDetailAsync(int rentalId)
+        {
+            return await _context.Transactions
+                .Include(t => t.Customer)
+                .Include(t => t.Camera)
+                .FirstOrDefaultAsync(t => t.RentalId == rentalId);
         }
     }
 }

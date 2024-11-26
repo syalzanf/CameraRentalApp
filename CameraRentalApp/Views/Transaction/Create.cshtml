@@ -102,51 +102,51 @@
         </div>
     </form>
 
-    <!-- Modal Add New Customer -->
-    <div class="modal fade" id="customerModal" tabindex="-1" aria-labelledby="customerModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="customerModalLabel">Add New Customer</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                <!-- Modal Add Customer -->
-            <form asp-action="AddCustomer" method="post" enctype="multipart/form-data" class="row g-3" id="transactionForm">
-                   <div class="col-md-6">
+   <!-- Modal Add New Customer -->
+<div class="modal fade" id="customerModal" tabindex="-1" aria-labelledby="customerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 600px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="customerModalLabel">Add New Customer</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form asp-action="AddCustomer" method="post" enctype="multipart/form-data" class="row g-3" id="transactionForm">
+                    <div class="col-12">
                         <div class="mb-3">
-                            <label asp-for="Transaction.Customer.CustomerName" class="form-label fw-bold">Nama Pelanggan</label>
-                            <input asp-for="Transaction.Customer.CustomerName" class="form-control" />
-                            <span asp-validation-for="Transaction.Customer.CustomerName" class="text-danger"></span>
-                        </div>
-         
-                        <div class="mb-3">
-                            <label asp-for="Transaction.Customer.PhoneNumber" class="form-label fw-bold">Nomor Telepon</label>
-                            <input asp-for="Transaction.Customer.PhoneNumber" class="form-control" />
-                            <span asp-validation-for="Transaction.Customer.PhoneNumber" class="text-danger"></span>
-                        </div>
-
-                        <div class="mb-3">
-                            <label asp-for="Transaction.Customer.Email" class="form-label fw-bold">Email</label>
-                            <input asp-for="Transaction.Customer.Email" class="form-control" />
-                            <span asp-validation-for="Transaction.Customer.Email" class="text-danger"></span>
+                            <label asp-for="Customer.CustomerName" class="form-label fw-bold">Nama Pelanggan</label>
+                            <input asp-for="Customer.CustomerName" class="form-control" />
+                            <span asp-validation-for="Customer.CustomerName" class="text-danger"></span>
                         </div>
         
                         <div class="mb-3">
-                            <label asp-for="Transaction.Customer.Address" class="form-label fw-bold">Alamat</label>
-                            <input asp-for="Transaction.Customer.Address" class="form-control" />
-                            <span asp-validation-for="Transaction.Customer.Address" class="text-danger"></span>
+                            <label asp-for="Customer.PhoneNumber" class="form-label fw-bold">Nomor Telepon</label>
+                            <input asp-for="Customer.PhoneNumber" class="form-control" />
+                            <span asp-validation-for="Customer.PhoneNumber" class="text-danger"></span>
                         </div>
 
+                        <div class="mb-3">
+                            <label asp-for="Customer.Email" class="form-label fw-bold">Email</label>
+                            <input asp-for="Customer.Email" class="form-control" />
+                            <span asp-validation-for="Customer.Email" class="text-danger"></span>
+                        </div>
         
-                        <button type="submit" class="btn btn-primary mt-4">Tambah Pelanggan</button>
+                        <div class="mb-3">
+                            <label asp-for="Customer.Address" class="form-label fw-bold">Alamat</label>
+                            <input asp-for="Customer.Address" class="form-control" />
+                            <span asp-validation-for="Customer.Address" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-primary">Tambah Pelanggan</button>
                     </div>
                 </form>
-                </div>
             </div>
         </div>
     </div>
 </div>
+
 
 @section Scripts {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.min.css">

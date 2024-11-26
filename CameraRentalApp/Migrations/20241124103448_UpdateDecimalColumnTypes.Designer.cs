@@ -4,6 +4,7 @@ using CameraRentalApp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CameraRentalApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241124103448_UpdateDecimalColumnTypes")]
+    partial class UpdateDecimalColumnTypes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -54,7 +56,7 @@ namespace CameraRentalApp.Migrations
 
                     b.HasKey("CameraId");
 
-                    b.ToTable("Cameras", (string)null);
+                    b.ToTable("Cameras");
                 });
 
             modelBuilder.Entity("CameraRentalApp.Models.Customer", b =>
@@ -89,7 +91,7 @@ namespace CameraRentalApp.Migrations
 
                     b.HasKey("CustomerId");
 
-                    b.ToTable("Customers", (string)null);
+                    b.ToTable("Customers");
                 });
 
             modelBuilder.Entity("CameraRentalApp.Models.Transaction", b =>

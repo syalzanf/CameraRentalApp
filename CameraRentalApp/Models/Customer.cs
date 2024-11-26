@@ -13,6 +13,9 @@ namespace CameraRentalApp.Models
         public string Email { get; set; }
         public string Address { get; set; }
 
-        public bool IsDeleted { get; set; } = false;
+        public bool IsDeleted { get; set; } 
+
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
     }
 }

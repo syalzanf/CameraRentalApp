@@ -2,9 +2,32 @@
 
 @{
     ViewData["Title"] = "Add Camera";
+    var errorMessage = TempData["Error"] as string;
+    var successMessage = TempData["Message"] as string;
+}
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <script>
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: '@errorMessage',
+        });
+    </script>
 }
 
-<form asp-action="Create" method="post">
+@if (!string.IsNullOrEmpty(successMessage))
+{
+    <script>
+        Swal.fire({
+            icon: 'success',
+            title: 'Success!',
+            text: '@successMessage',
+        });
+    </script>
+}
+
+<form asp-action="Create" method="post" enctype="multipart/form-data">
     <div class="row justify-content-center">
         <div class="col-md-4">
             <div class="card">
@@ -13,33 +36,33 @@
                 </div>
                 <div class="card-body">
                     <div class="form-group">
-                        <label for="Name">Name</label>
+                        <label asp-for="Name" class="form-label">Name</label>
                         <input asp-for="Name" type="text" class="form-control" placeholder="Enter name" required />
                         <span asp-validation-for="Name" class="text-danger"></span>
                     </div>
                     
                     <div class="form-group">
-                        <label for="Brand">Brand</label>
+                        <label asp-for="Brand" class="form-label">Brand</label>
                         <input asp-for="Brand" type="text" class="form-control" placeholder="Enter Brand" required />
                         <span asp-validation-for="Brand" class="text-danger"></span>
                     </div>
 
                     <div class="form-group">
-                        <label for="Stock">Stock</label>
+                        <label asp-for="Stock" class="form-label">Stock</label>
                         <input asp-for="Stock" type="number" class="form-control" placeholder="Enter Stock" required />
                         <span asp-validation-for="Stock" class="text-danger"></span>
                     </div>
 
                     <div class="form-group">
-                        <label for="RentalPricePerDay">Rental Price</label>
+                        <label asp-for="RentalPricePerDay" class="form-label">Rental Price</label>
                         <input asp-for="RentalPricePerDay" type="number" class="form-control" placeholder="Enter Price" required />
                         <span asp-validation-for="RentalPricePerDay" class="text-danger"></span>
                     </div>
 
-                    <div class="form-group">
-                        <label for="imageFile">Upload Image</label>
-                       <input asp-for="Image" type="file" class="form-control-file" id="imageFile" name="imageFile" placeholder="Enter Price" required />
-                       <span asp-validation-for="Image" class="text-danger"></span>
+                      <div class="form-group">
+                        <label for="imageFile" class="form-label">Upload Image</label>
+                        <input type="file" name="imageFile" class="form-control" accept="image/*" required />
+                        <span class="text-danger" asp-validation-for="Image"></span>
                     </div>
 
                     <div class="form-group">

@@ -17,7 +17,7 @@ namespace CameraRentalApp.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Brand = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    RentalPricePerDay = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    RentalPricePerDay = table.Column<decimal>(type: "decimal(18,0)", nullable: false),
                     Stock = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -34,7 +34,8 @@ namespace CameraRentalApp.Migrations
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Address = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                
                 },
                 constraints: table =>
                 {

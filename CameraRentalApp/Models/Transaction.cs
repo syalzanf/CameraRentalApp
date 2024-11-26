@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace CameraRentalApp.Models
 {
@@ -7,10 +8,10 @@ namespace CameraRentalApp.Models
         [Key]
         public int RentalId { get; set; }
 
-        [Required(ErrorMessage = "Customer field is required.")]
+        [Required]
         public int CustomerId { get; set; }
 
-        [Required(ErrorMessage = "Camera field is required.")]
+        [Required]
         public int CameraId { get; set; }
 
         public DateTime RentalDate { get; set; } = DateTime.Now;
@@ -18,16 +19,17 @@ namespace CameraRentalApp.Models
 
         public decimal RentalPricePerDay { get; set; }
         public decimal TotalPrice { get; set; }
-        public string PaymentMethod { get; set; }
         public decimal TotalPay { get; set; }
         public decimal Change { get; set; }
 
-
+        public string PaymentMethod { get; set; }
         public string? Status { get; set; }
         public string? return_proof { get; set; }
 
-
+        [ValidateNever]
         public Customer? Customer { get; set; }
+
+        [ValidateNever]
         public Camera? Camera { get; set; }
 
     }

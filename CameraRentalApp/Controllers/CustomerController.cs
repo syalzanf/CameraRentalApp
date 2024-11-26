@@ -8,16 +8,20 @@ using System.Threading.Tasks;
 public class CustomerController : Controller
 {
     private readonly CustomerService _customerService;
+    private readonly ILogger<CustomerController> _logger;
 
-    public CustomerController( CustomerService customerService)
+    public CustomerController( CustomerService customerService, ILogger<CustomerController> logger)
     {
         _customerService = customerService;
+        _logger = logger;
     }
 
     [HttpGet]
     public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 5, string searchTerm = "")
     {
         var customers = await _customerService.GetAllCustomerAsync();
+        _logger.LogInformation("Total customers retrieved: {Count}", customers.Count);
+
 
         if (!string.IsNullOrEmpty(searchTerm))
         {
@@ -26,15 +30,21 @@ public class CustomerController : Controller
                                               c.Address.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
                                               c.PhoneNumber.ToString().Contains(searchTerm))
                                  .ToList();
+            _logger.LogInformation("Customers after filtering: {Count}", customers.Count);
+
         }
 
         var totalItems = customers.Count;
+        _logger.LogInformation("Paginating data. Total items: {TotalItems}, PageNumber: {PageNumber}, PageSize: {PageSize}", totalItems, pageNumber, pageSize);
+
 
         var paginatedCustomers = customers
-            .OrderBy(c => c.CustomerName)
+            .OrderByDescending(c => c.CreatedAt)
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToList();
+
+        _logger.LogInformation("Customers to display on current page: {Count}", paginatedCustomers.Count);
 
         ViewBag.PageNumber = pageNumber;
         ViewBag.PageSize = pageSize;
@@ -51,7 +61,7 @@ public class CustomerController : Controller
     {
         if (ModelState.IsValid)
         {
-            await _customerService.CreateCustomerAsync(customer);
+            await _customerService.AddCustomerAsync(customer);
             TempData["Message"] = "Success Added Product!";
             return RedirectToAction("Index");
             //return RedirectToAction("CreateTransaction", new { customerId = customer.CustomerId });
@@ -59,6 +69,7 @@ public class CustomerController : Controller
         return View(customer);
     }
 
+    [HttpPost]
     public async Task<IActionResult> Edit(int id)
     {
         var customer = await _customerService.GetCustomerByIdAsync(id);
@@ -85,8 +96,20 @@ public class CustomerController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(int customerId)
     {
-        await _customerService.DeleteCustomerAsync(customerId);
-        TempData["Message"] = "Customer deleted successfully.";
+        _logger.LogInformation($"Delete action for customer ID: {customerId}");
+
+        bool isDeleted = await _customerService.DeleteCustomerAsync(customerId);
+        if (!isDeleted)
+        {
+            _logger.LogWarning($"Delete failed: Customer ID {customerId} not found.");
+            TempData["Error"] = "Customer not found!";
+        }
+        else
+        {
+            _logger.LogInformation($"Customer ID {customerId} deleted successfully.");
+            TempData["Message"] = "Customer deleted successfully!";
+        }
+
         return RedirectToAction("Index");
     }
 }

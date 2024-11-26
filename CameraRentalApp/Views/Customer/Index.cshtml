@@ -1,4 +1,5 @@
-﻿@model IEnumerable<CameraRentalApp.Models.Customer>
+﻿@Html.AntiForgeryToken()
+@model IEnumerable<CameraRentalApp.Models.Customer>
 
 @{
     ViewData["Title"] = "Master Customer";
@@ -34,41 +35,22 @@
             </text>
         }
 
-        function confirmDelete(cameraId) {
-            Swal.fire({
-                title: 'Are you sure?',
-                text: 'This action cannot be undone!',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                   
-                    const form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = '@Url.Action("", "Customer")';
+        function confirmDelete(customerId) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
 
-                    const input = document.createElement('input');
-                    input.type = 'hidden';
-                    input.name = 'CustomerId';
-                    input.value = customerId;
-                    form.appendChild(input);
-
-                    const csrfToken = document.querySelector('input[name="__RequestVerificationToken"]').value;
-                    const csrfInput = document.createElement('input');
-                    csrfInput.type = 'hidden';
-                    csrfInput.name = '__RequestVerificationToken';
-                    csrfInput.value = csrfToken;
-                    form.appendChild(csrfInput);
-
-                    document.body.appendChild(form);
-                    form.submit();
-                }
-            });
-        }
-
+                document.getElementById(`delete-form-${customerId}`).submit();
+            }
+        });
+    }
 
         function handleSearch(event) {
             const searchTerm = event.target.value;
@@ -96,9 +78,6 @@
 
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
-      @*  <a asp-action="Create" class="btn btn-primary">
-            <i class="fas fa-plus-circle"></i> Create
-        </a>*@
     </div>
 
     <div class="card-body">
@@ -125,9 +104,13 @@
                                 <a asp-action="Edit" asp-controller="Customer" asp-route-id="@customer.CustomerId" class="btn btn-warning btn-sm text-white">
                                     <i class="fas fa-edit"></i> Edit
                                 </a>
-                                <button class="btn btn-danger btn-sm" onclick="confirmDelete(@customer.CustomerId)">
-                                    <i class="fas fa-trash-alt"></i> Delete
-                                </button>
+                                  <form asp-action="Delete" asp-controller="Customer" method="post" style="display:inline;" id="delete-form-@customer.CustomerId">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="customerId" value="@customer.CustomerId" />
+                                    <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete(@customer.CustomerId)">
+                                        <i class="fas fa-trash-alt"></i> Delete
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                     }
@@ -156,3 +139,5 @@
         </nav>
     </div>
 </div>
+
+
