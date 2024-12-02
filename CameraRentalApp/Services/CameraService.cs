@@ -60,7 +60,7 @@ namespace CameraRentalApp.Services
             _logger.LogInformation("Image uploaded successfully: {FilePath}", filePath);
             return fileName;
         }
-
+         
         public async Task DeleteImageAsync(string imagePath)
         {
             var fullPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", imagePath.TrimStart('/'));

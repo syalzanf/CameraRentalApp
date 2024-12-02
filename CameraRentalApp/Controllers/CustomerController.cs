@@ -69,7 +69,7 @@ public class CustomerController : Controller
         return View(customer);
     }
 
-    [HttpPost]
+    [HttpGet]
     public async Task<IActionResult> Edit(int id)
     {
         var customer = await _customerService.GetCustomerByIdAsync(id);

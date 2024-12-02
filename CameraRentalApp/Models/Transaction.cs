@@ -9,6 +9,9 @@ namespace CameraRentalApp.Models
         public int RentalId { get; set; }
 
         [Required]
+        public string RentalCode { get; set; }
+
+        [Required]
         public int CustomerId { get; set; }
 
         [Required]
@@ -31,6 +34,8 @@ namespace CameraRentalApp.Models
 
         [ValidateNever]
         public Camera? Camera { get; set; }
+
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     }
 }

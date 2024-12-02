@@ -72,7 +72,6 @@ namespace CameraRentalApp.Services
             return _context.Transactions.AsQueryable();
         }
 
-
         public async Task<string> ProcessPaymentAsync(int transactionId, decimal totalPayment)
         {
             var transaction = await _context.Transactions.FindAsync(transactionId);
@@ -81,26 +80,27 @@ namespace CameraRentalApp.Services
                 throw new InvalidOperationException("Transaction not found.");
             }
 
+            // Memuat ulang data transaksi untuk memastikan tidak ada perubahan yang tidak terdeteksi
+             _context.Entry(transaction).Reload();
+
             if (transaction.PaymentMethod == "cash")
             {
-
-
                 if (totalPayment < transaction.TotalPrice)
                 {
                     throw new ArgumentException("Insufficient payment.");
                 }
 
                 transaction.TotalPay = totalPayment;
-
                 transaction.Change = totalPayment - transaction.TotalPrice;
 
+                // Memeriksa status pengembalian
                 if (transaction.ReturnDate < DateTime.Now)
                 {
-                    transaction.Status = "Overdue"; 
+                    transaction.Status = "Overdue";
                 }
                 else
                 {
-                    transaction.Status = "Confirmed"; 
+                    transaction.Status = "Confirmed";
                 }
             }
             else
@@ -108,12 +108,62 @@ namespace CameraRentalApp.Services
                 transaction.TotalPay = transaction.TotalPrice;
             }
 
-            _context.Update(transaction);
-            await _context.SaveChangesAsync();
+            // Menyimpan transaksi yang sudah diperbarui
+            try
+            {
+                _context.Update(transaction);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                throw new InvalidOperationException("Data telah diubah oleh pengguna lain.");
+            }
 
             return $"Payment successful. Change amount: {transaction.Change}";
         }
 
+
+        /*        public async Task<string> ProcessPaymentAsync(int transactionId, decimal totalPayment)
+                {
+                    var transaction = await _context.Transactions.FindAsync(transactionId);
+                    if (transaction == null)
+                    {
+                        throw new InvalidOperationException("Transaction not found.");
+                    }
+
+                    if (transaction.PaymentMethod == "cash")
+                    {
+
+
+                        if (totalPayment < transaction.TotalPrice)
+                        {
+                            throw new ArgumentException("Insufficient payment.");
+                        }
+
+                        transaction.TotalPay = totalPayment;
+
+                        transaction.Change = totalPayment - transaction.TotalPrice;
+
+                        if (transaction.ReturnDate < DateTime.Now)
+                        {
+                            transaction.Status = "Overdue"; 
+                        }
+                        else
+                        {
+                            transaction.Status = "Confirmed"; 
+                        }
+                    }
+                    else
+                    {
+                        transaction.TotalPay = transaction.TotalPrice;
+                    }
+
+                    _context.Update(transaction);
+                    await _context.SaveChangesAsync();
+
+                    return $"Payment successful. Change amount: {transaction.Change}";
+                }
+        */
         public async Task<string> UploadReturnProofAsync(int transactionId, IFormFile returnProof)
         {
             if (returnProof != null && returnProof.Length > 0)
@@ -133,7 +183,7 @@ namespace CameraRentalApp.Services
                     if (transaction.Status == "Returned")
                     {
                       
-                        transaction.return_proof = $"/uploads/{returnProof.FileName}";
+                        transaction.return_proof = $"{returnProof.FileName}";
 
                         if (transaction.ReturnDate.Date == DateTime.Now.Date)
                         {

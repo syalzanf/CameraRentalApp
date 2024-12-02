@@ -43,6 +43,11 @@
                 </div>
                 <div class="card-body">
                     <div class="form-group">
+                        <label asp-for="CameraCode" class="form-label">Product Code</label>
+                        <input asp-for="CameraCode" type="text" class="form-control" placeholder="Enter name" required readonly />
+                        <span asp-validation-for="CameraCode" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
                         <label asp-for="Name" class="form-label">Name</label>
                         <input asp-for="Name" type="text" class="form-control" placeholder="Enter name" required />
                         <span asp-validation-for="Name" class="text-danger"></span>
@@ -84,7 +89,7 @@
                     </div>
                 </div>
 
-                <div class="card-footer text-right">
+                <div class="card-footer text-left">
                     <button type="submit" class="btn btn-success">Save Changes</button>
                     <a asp-action="Index" class="btn btn-secondary">Cancel</a>
                 </div>

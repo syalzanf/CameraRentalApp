@@ -8,6 +8,8 @@ namespace CameraRentalApp.Models
         [Key]
         public int CameraId { get; set; }
 
+ 
+        public string CameraCode { get; set; }
         [Required]
         public string Name { get; set; }
         [Required]

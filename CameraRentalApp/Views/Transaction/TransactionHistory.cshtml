@@ -21,11 +21,16 @@
             <table class="table table-striped table-hover">
                 <thead class="table-secondary">
                     <tr>
-                        <th>Rental ID</th>
+                        <th>Rental Code</th>
                         <th>Customer</th>
                         <th>Camera</th>
                         <th>Rental Date</th>
                         <th>Return Date</th>
+                      @*  <th>Price Per Day</th>
+                        <th>Total Price</th>
+                        <th>Payment Method</th>
+                        <th>Total Pay</th>
+                        <th>Change</th>*@
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -33,15 +38,22 @@
                     @foreach (var transaction in Model)
                     {
                         <tr>
-                            <td>@transaction.RentalId</td>
+                            <td>@transaction.RentalCode</td>
                             <td>@transaction.Customer.CustomerName</td>
                             <td>@transaction.Camera.Name</td>
                             <td>@transaction.RentalDate.ToString("yyyy-MM-dd")</td>
                             <td>@transaction.ReturnDate.ToString("yyyy-MM-dd")</td>
+                        @*    <td>@transaction.RentalPricePerDay</td>
+                            <td>@transaction.TotalPrice</td>
+                            <td>@transaction.PaymentMethod</td>
+                            <td>@transaction.TotalPay</td>
+                            <td>@transaction.Change</td>*@
                             <td>
-                                <button class="btn btn-info" data-toggle="modal" data-target="#transactionDetailModal" data-id="@transaction.RentalId">Detail</button>
+                               <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#transactionDetailModal-@transaction.RentalId">
+                                   Detail
+                               </button>
                             </td>
-                        </tr>
+                        </tr> 
                     }
                 </tbody>
             </table>
@@ -68,3 +80,71 @@
         </nav>
     </div>
 </div>
+
+
+@foreach (var transaction in Model)
+{
+    <div class="modal fade" id="transactionDetailModal-@transaction.RentalId" tabindex="-1" aria-labelledby="transactionDetailModalLabel-@transaction.RentalId" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="transactionDetailModalLabel-@transaction.RentalCode">Transaction Details - @transaction.RentalCode</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label><strong>Rental Code</strong></label>
+                                <input type="text" class="form-control" value="@transaction.RentalCode" readonly />
+                            </div>
+                            <div class="form-group">
+                                <label><strong>Customer Name</strong></label>
+                                <input type="text" class="form-control" value="@transaction.Customer.CustomerName" readonly />
+                            </div>
+                            <div class="form-group">
+                                <label><strong>Camera Name</strong></label>
+                                <input type="text" class="form-control" value="@transaction.Camera.Name" readonly />
+                            </div>
+                            <div class="form-group">
+                                <label><strong>Rental Date</strong></label>
+                                <input type="text" class="form-control" value="@transaction.RentalDate.ToString("yyyy-MM-dd")" readonly />
+                            </div>
+                            <div class="form-group">
+                                <label><strong>Return Date</strong></label>
+                                <input type="text" class="form-control" value="@transaction.ReturnDate.ToString("yyyy-MM-dd")" readonly />
+                            </div>
+                        </div>
+
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label><strong>Price Per Day</strong></label>
+                                <input type="text" class="form-control" value="@transaction.RentalPricePerDay" readonly />
+                            </div>
+                            <div class="form-group">
+                                <label><strong>Total Price</strong></label>
+                                <input type="text" class="form-control" value="@transaction.TotalPrice" readonly />
+                            </div>
+                            <div class="form-group">
+                                <label><strong>Payment Method</strong></label>
+                                <input type="text" class="form-control" value="@transaction.PaymentMethod" readonly />
+                            </div>
+                            <div class="form-group">
+                                <label><strong>Total Pay</strong></label>
+                                <input type="text" class="form-control" value="@transaction.TotalPay" readonly />
+                            </div>
+                            <div class="form-group">
+                                <label><strong>Change</strong></label>
+                                <input type="text" class="form-control" value="@transaction.Change" readonly />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}

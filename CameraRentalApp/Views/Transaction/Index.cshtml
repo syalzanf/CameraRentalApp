@@ -57,6 +57,7 @@
                 <thead class="table-secondary">
                     <tr>
                         <th>Rental ID</th>
+                        <th>Rental Code</th>
                         <th>Customer</th>
                         <th>Camera</th>
                         <th>Rental Date</th>
@@ -73,6 +74,7 @@
                     {
                         <tr>
                             <td>@transaction.RentalId</td>
+                            <td>@transaction.RentalCode</td>
                             <td>@transaction.Customer.CustomerName</td>
                             <td>@transaction.Camera.Name</td>
                             <td>@transaction.RentalDate.ToString("yyyy-MM-dd")</td>

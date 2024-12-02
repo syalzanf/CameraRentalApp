@@ -94,12 +94,14 @@
             <table class="table table-striped table-hover">
                 <thead class="table-secondary">
                     <tr>
+                        <th>Product Code</th>
                         <th>Name</th>
                         <th>Brand</th>
-                        <th>Rental Price</th>
-                        <th>Stock</th>
-                         <th>Image</th>
                         <th>Action</th>
+                    @*    <th>Rental Price</th>
+                        <th>Stock</th>
+                        <th>Image</th>
+                    *@
                     </tr>
                 </thead>
                 <tbody>
@@ -107,14 +109,18 @@
                     {
                         <tr>
                            
+                            <td>@camera.CameraCode</td>
                             <td>@camera.Name</td>
                             <td>@camera.Brand</td>
-                            <td>@camera.RentalPricePerDay</td>
+                        @*    <td>@camera.RentalPricePerDay</td>
                             <td>@camera.Stock</td>
-                             <td>
-                                <img src="@Url.Content("~/images/cameras/" + camera.Image)" alt="@camera.Name" style="max-width: 50px; max-height: 100px;"/> 
-                            </td>
                             <td>
+                                <img src="@Url.Content("~/images/cameras/" + camera.Image)" alt="@camera.Name" style="max-width: 50px; max-height: 100px;"/> 
+                            </td>*@
+                            <td>
+                                <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#cameraDetailModal-@camera.CameraId">
+                                    <i class="fas fa-info-circle"></i> Detail
+                                </button>
                                 <a asp-action="Edit" asp-controller="Camera" asp-route-id="@camera.CameraId" class="btn btn-warning btn-sm text-white">
                                     <i class="fas fa-edit"></i> Edit
                                 </a>
@@ -131,6 +137,59 @@
                 </tbody>
             </table>
         </div>
+
+
+@foreach (var camera in Model)
+{
+    <div class="modal fade" id="cameraDetailModal-@camera.CameraId" tabindex="-1" aria-labelledby="cameraDetailModalLabel-@camera.CameraId" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cameraDetailModalLabel-@camera.CameraId">Camera Details : @camera.Name</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="cameraCode" class="form-label">Product Code</label>
+                                <input type="text" id="cameraCode" class="form-control" value="@camera.CameraCode" readonly />
+                            </div>
+                            <div class="form-group">
+                                <label for="cameraName" class="form-label">Name</label>
+                                <input type="text" id="cameraName" class="form-control" value="@camera.Name" readonly />
+                            </div>
+                            <div class="form-group">
+                                <label for="cameraBrand" class="form-label">Brand</label>
+                                <input type="text" id="cameraBrand" class="form-control" value="@camera.Brand" readonly />
+                            </div>
+                            <div class="form-group">
+                                <label for="rentalPrice" class="form-label">Rental Price</label>
+                                <input type="number" id="rentalPrice" class="form-control" value="@camera.RentalPricePerDay" readonly />
+                            </div>
+                            <div class="form-group">
+                                <label for="cameraStock" class="form-label">Stock</label>
+                                <input type="number" id="cameraStock" class="form-control" value="@camera.Stock" readonly />
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="text-center">
+                                <img src="@Url.Content("~/images/cameras/" + camera.Image)" alt="@camera.Name" class="img-fluid" style="max-height: 400px; width: auto;" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+
 
 <!-- Modal for Adding a New Camera -->
 <div class="modal fade" id="AddCameraModal" tabindex="-1" aria-labelledby="createCameraModalLabel" aria-hidden="true">
