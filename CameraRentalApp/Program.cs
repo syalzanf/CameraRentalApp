@@ -1,7 +1,9 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 using CameraRentalApp.Data;
+using CameraRentalApp.Models;
 using CameraRentalApp.Services;
-using CameraRentalApp.Interfaces;
+using CameraRentalApp.Middlewares;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting; 
 using Microsoft.Extensions.DependencyInjection;
@@ -12,19 +14,33 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 
-
+// Configure database connection
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection") ??
+        throw new InvalidOperationException("Connection string 'ApplicationDbContext' not found.")));
 
-builder.Services.AddAuthentication("CookieAuth")
-    .AddCookie("CookieAuth", config =>
-    {
-        config.Cookie.Name = "UserLoginCookie";
-        config.LoginPath = "/Account/Login";
-    });
+// Configure session
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
+// Configure Identity
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+{
+    options.Password.RequireDigit = true;
+    options.Password.RequiredLength = 8;
+    options.Password.RequireUppercase = true;
+})
+.AddRoles<IdentityRole>()
+.AddEntityFrameworkStores<ApplicationDbContext>()
+.AddDefaultTokenProviders();
+
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddAuthorization();
-
 builder.Services.AddScoped<CameraService>();
 builder.Services.AddScoped<CustomerService>();
 builder.Services.AddScoped<TransactionService>();
@@ -36,7 +52,7 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    app.UseDeveloperExceptionPage();
+    app.UseDeveloperExceptionPage();    
 }
 else
 {
@@ -44,17 +60,20 @@ else
     app.UseHsts();
 }
 
+
 app.UseHttpsRedirection();
-app.UseStaticFiles();   
+app.UseStaticFiles();
 app.UseRouting();
-app.UseAuthorization();
-app.UseDeveloperExceptionPage();
+
+app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseDeveloperExceptionPage();
 
+//app.UseMiddleware<RoleRedirectMiddleware>();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Account}/{action=Login}/{id?}");
 
 app.Run();

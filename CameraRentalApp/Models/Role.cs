@@ -9,6 +9,7 @@ namespace CameraRentalApp.Models
         [Required]
         public string RoleName { get; set; }
 
+        // Relasi ke UserRoles
         public ICollection<UserRole> UserRoles { get; set; }
     }
 }

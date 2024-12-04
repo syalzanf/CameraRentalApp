@@ -1,18 +1,20 @@
-﻿    using CameraRentalApp.Models;
-    using CameraRentalApp.Services;
-    using CameraRentalApp.ViewModels;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.Extensions.Logging;
-    using System.Linq;
-    using System.Threading.Tasks;
-    using Microsoft.EntityFrameworkCore;
-    using Newtonsoft.Json;
+﻿using Microsoft.AspNetCore.Authorization;
+using CameraRentalApp.Models;
+using CameraRentalApp.Services;
+using CameraRentalApp.ViewModels;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 
 
 
 namespace CameraRentalApp.Controllers
     {
-        public class TransactionController : Controller
+    [Authorize(Roles = "Admin")]
+    public class TransactionController : Controller
         {
             private readonly TransactionService _transactionService;
             private readonly CameraService _cameraService;
@@ -27,7 +29,7 @@ namespace CameraRentalApp.Controllers
             _logger = logger;
         }
 
-        // GET: Transaction/Index
+        [Route("admin/transactions")]
         [HttpGet]
             public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 5, string searchTerm = "")
             {
@@ -63,7 +65,7 @@ namespace CameraRentalApp.Controllers
                 return View(paginatedTransactions);
             }
 
-
+        [Route("admin/transactions/history")]
         [HttpGet]
         public async Task<IActionResult> TransactionHistory(int pageNumber = 1, int pageSize = 5, string searchTerm = "")
         {
@@ -77,13 +79,14 @@ namespace CameraRentalApp.Controllers
             return View(transactions);
         }
 
+        [Route("admin/transactions/detail")]
         [HttpGet]
         public async Task<IActionResult> GetDetail(int rentalId)
         {
             var transaction = await _transactionService.GetTransactionDetailAsync(rentalId);
 
             if (transaction == null)
-            {
+            { 
                 return NotFound(new { message = "Transaction not found" });
             }
 
@@ -97,7 +100,7 @@ namespace CameraRentalApp.Controllers
             });
         }
 
-        // GET: Transaction/Create
+        [Route("admin/transactions/create")]
         [HttpGet]
             public async Task<IActionResult> Create()
             {
@@ -114,7 +117,7 @@ namespace CameraRentalApp.Controllers
                 return View(viewModel);  
             }
 
-        // POST: Transaction/Create
+        [Route("admin/transactions/create")]
         [HttpPost]
         public async Task<IActionResult> Create(TransactionViewModel viewModel)
         {
@@ -168,10 +171,9 @@ namespace CameraRentalApp.Controllers
                 viewModel.Cameras = await _cameraService.GetAllCameraAsync();
                 return View(viewModel);
             }
-        } 
+        }
 
-
-        [Route("Transaction/AddCustomer")]
+        [Route("admin/transactions/addCustomer")]
         [HttpPost]
         public async Task<IActionResult> AddCustomer(Customer customer)
         {
@@ -186,6 +188,7 @@ namespace CameraRentalApp.Controllers
         }
 
 
+        [Route("admin/uploadReturnProof")]
         [HttpPost]
         public async Task<IActionResult> UploadReturnProof(int transactionId, IFormFile returnProof)
         {
