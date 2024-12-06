@@ -56,7 +56,6 @@
             <table class="table table-striped table-hover">
                 <thead class="table-secondary">
                     <tr>
-                        <th>Rental ID</th>
                         <th>Rental Code</th>
                         <th>Customer</th>
                         <th>Camera</th>
@@ -73,7 +72,6 @@
                     @foreach (var transaction in Model)
                     {
                         <tr>
-                            <td>@transaction.RentalId</td>
                             <td>@transaction.RentalCode</td>
                             <td>@transaction.Customer.CustomerName</td>
                             <td>@transaction.Camera.Name</td>

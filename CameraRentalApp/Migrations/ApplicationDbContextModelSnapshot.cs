@@ -133,7 +133,7 @@ namespace CameraRentalApp.Migrations
 
                     b.HasKey("CameraId");
 
-                    b.ToTable("Cameras");
+                    b.ToTable("Cameras", (string)null);
                 });
 
             modelBuilder.Entity("CameraRentalApp.Models.Customer", b =>
@@ -168,7 +168,7 @@ namespace CameraRentalApp.Migrations
 
                     b.HasKey("CustomerId");
 
-                    b.ToTable("Customers");
+                    b.ToTable("Customers", (string)null);
                 });
 
             modelBuilder.Entity("CameraRentalApp.Models.Role", b =>
@@ -185,7 +185,7 @@ namespace CameraRentalApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Roles");
+                    b.ToTable("Roles", (string)null);
                 });
 
             modelBuilder.Entity("CameraRentalApp.Models.Transaction", b =>
@@ -271,7 +271,7 @@ namespace CameraRentalApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("CameraRentalApp.Models.UserRole", b =>
@@ -286,7 +286,7 @@ namespace CameraRentalApp.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("UserRoles");
+                    b.ToTable("UserRoles", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

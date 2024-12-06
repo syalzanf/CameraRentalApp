@@ -9,7 +9,7 @@ namespace CameraRentalApp.Models
         public int RentalId { get; set; }
 
         [Required]
-        public string RentalCode { get; set; }
+        public string? RentalCode { get; set; }
 
         [Required]
         public int CustomerId { get; set; }

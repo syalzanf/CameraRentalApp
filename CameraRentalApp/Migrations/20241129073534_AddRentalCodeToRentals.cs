@@ -12,7 +12,7 @@ namespace CameraRentalApp.Migrations
                 name: "RentalCode",
                 table: "Rentals",
                 type: "nvarchar(max)",
-                nullable: false,
+                nullable: true,
                 defaultValue: "");
         }
 

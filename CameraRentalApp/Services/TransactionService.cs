@@ -43,28 +43,43 @@ namespace CameraRentalApp.Services
         public async Task AddTransactionAsync(Transaction transaction)
 
         {
-
-            int rentalDays = (transaction.ReturnDate - transaction.RentalDate).Days;
-
-            if (rentalDays > 0)
+            using (var transactionScope = await _context.Database.BeginTransactionAsync())
             {
-                transaction.TotalPrice = rentalDays * transaction.RentalPricePerDay;
-            }
-            else
-            {
-                throw new ArgumentException("Return date must be after rental date.");
-            }
+                try
+                {
+                    if (transaction.RentalDate >= transaction.ReturnDate)
+                    {
+                        throw new ArgumentException("Return date must be after rental date.");
+                    }
 
-            if (transaction.PaymentMethod != "cash")
-            {
-                transaction.TotalPay = transaction.TotalPrice;
+                    int rentalDays = (transaction.ReturnDate - transaction.RentalDate).Days;
+
+                    if (rentalDays <= 0)
+                    {
+                        throw new ArgumentException("Invalid rental duration.");
+                    }
+
+                    transaction.TotalPrice = rentalDays * transaction.RentalPricePerDay;
+
+                    if (transaction.PaymentMethod != "cash")
+                    {
+                        transaction.TotalPay = transaction.TotalPrice;
+                    }
+
+                    transaction.Status = "Ongoing";
+
+
+                    await _context.Transactions.AddAsync(transaction);
+                    await _context.SaveChangesAsync();
+
+                    await transactionScope.CommitAsync();
+                }
+                catch (Exception ex)
+                {
+                    await transactionScope.RollbackAsync();
+                    throw new InvalidOperationException("An error occurred while adding the transaction.", ex);
+                }
             }
-
-            transaction.Status = "Ongoing";
-
-            
-            await _context.Transactions.AddAsync(transaction);
-            await _context.SaveChangesAsync();
         }
 
         public IQueryable<Transaction> GetAllTransactionsAsync()

@@ -74,38 +74,38 @@ public class AccountController : Controller
     }
 
 
-/*  [HttpGet]
+    [HttpGet]
     [AllowAnonymous]
     public async Task<IActionResult> Register()
     {
-            var user = new ApplicationUser
+        var user = new ApplicationUser
+        {
+            UserName = "ADMIN1",
+            Email = "Admin1@gmail.com",
+            FullName = "AdminAdmin",
+            Role = "Admin"
+        };
+
+        var password = "Admin11@";
+
+        var result = await _userManager.CreateAsync(user, password);
+
+        if (result.Succeeded)
+        {
+            await _userManager.AddToRoleAsync(user, "Admin");
+
+            await _signInManager.SignInAsync(user, isPersistent: false);
+
+        }
+        else
+        {
+            foreach (var error in result.Errors)
             {
-                UserName = "Admin",
-                Email = "Admin@gmail.com",
-                FullName = "Admin1",
-                Role = "Admin"
-            };
-
-            var password = "Admin123@";
-
-            var result = await _userManager.CreateAsync(user, password);
-
-            if (result.Succeeded)
-            {
-                await _userManager.AddToRoleAsync(user, "Admin");
-
-                await _signInManager.SignInAsync(user, isPersistent: false);
-
+                ModelState.AddModelError(string.Empty, error.Description);
             }
-            else
-            {
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError(string.Empty, error.Description);
-                }
-            }
+        }
         return RedirectToAction(nameof(Login));
-    }*/
+    }
 }
 
 

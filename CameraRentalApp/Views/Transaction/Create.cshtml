@@ -94,7 +94,7 @@
         </div>
 
         <div class="col-12 d-flex justify-content-end">
-            <button type="submit" class="btn btn-primary w-100 mt-4">Submit Transaction</button>
+            <button type="submit" id="submitTransactionButton" class="btn btn-primary w-100 mt-4">Submit Transaction</button>
         </div>
         
         <div class="col-12">
@@ -139,7 +139,7 @@
                     </div>
 
                     <div class="d-flex justify-content-end">
-                        <button type="submit" class="btn btn-primary">Tambah Pelanggan</button>
+                        <button type="submit"  id="submitCustomerButton" class="btn btn-primary">Tambah Pelanggan</button>
                     </div>
                 </form>
             </div>
@@ -221,7 +221,29 @@
 
     document.getElementById("PaymentMethod").addEventListener("change", updateTotalPayBasedOnPaymentMethod);
 
-   
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const transactionForm = document.getElementById("transactionForm");
+        const transactionButton = document.getElementById("submitTransactionButton");
+
+        transactionForm.addEventListener("submit", function () {
+
+            transactionButton.disabled = true;
+            transactionButton.textContent = "Submitting...";
+        });
+
+
+        const addCustomerForm = document.getElementById("addCustomerForm");
+        const customerButton = document.getElementById("submitCustomerButton");
+
+        addCustomerForm.addEventListener("submit", function () {
+            
+            customerButton.disabled = true;
+            customerButton.textContent = "Submitting...";
+        });
+    });
+
+
 </script>
 
 }
